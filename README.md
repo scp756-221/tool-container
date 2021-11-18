@@ -196,8 +196,14 @@ privileges.
 2. Test the new image by running it. First, `cd` to the `e-k8s` directory of
    the code repo. Then:
 
-   * On a local amd machine, run `tools/shell.sh`.
-   * On a remote arm machine, run `run-on-arm.sh`.
+   * On a local amd machine, run `run-on-amd.sh`. This script requires
+     the shell variable `VAR_HOME` to be set, defining the path to a
+     directory containing the `version.txt` file.
+     If you just want to use the image version specified in
+     `Makefile`, you can run `tools/shell.sh` without an argument.
+   * On a remote arm machine, run `run-on-arm.sh`. No shell variable
+     is required for this---`version.txt` is assumed to be in the home
+     directory, where it is placed by `send-to-arm.sh`
 
    Once in the container, a simple test of whether the build completed
    is to run `k9s`. There will be no cluster for it to connect to but
