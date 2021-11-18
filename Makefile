@@ -8,7 +8,7 @@ REGID=overcoil
 INAME=c756-tool
 AINAME=$(CREG)/$(REGID)/$(INAME)
 
-# override this (to arm) if you're on an M1 Mac
+# override this (to arm) if you're use this Makefile on an M1 Mac
 THIS_ARCH=x86
 
 # this is the public repo name as communicated to students
@@ -48,14 +48,18 @@ x86:
 	docker build --tag $(AINAME):x86 --build-arg K9S_ARCH=$(X86_K9S_ARCH) . 
 	docker image ls | grep $(INAME)
 
+# TODO: suspect!
 # override for ARM
 arm:
-	docker build --tag $(AINAME):arm --build-arg ARCH_CLASS=$(ARM_ARCH_CLASS) --build-arg ARCH_BRAND=$(ARM_ARCH_BRAND) --build-arg K9S_ARCH=$(ARM_K9S_ARCH) . 
+	docker build --tag $(AINAME):arm \
+		--build-arg ARCH_CLASS=$(ARM_ARCH_CLASS)  \
+		--build-arg ARCH_BRAND=$(ARM_ARCH_BRAND)  \
+		--build-arg K9S_ARCH=$(ARM_K9S_ARCH) . 
 	docker image ls | grep $(INAME)
 
 # convenient target to start the LOCAL copy
-GHOME=/Users/gkyc/newroot/GitHub.nosync/sfu/c756.211.dead/sfu-cmpt756.203/gatling-charts-highcharts-bundle-3.5.0
-CHOME=/Users/gkyc/newroot/GitHub.nosync/sfu/c756-cont
+GHOME=~/newroot/GitHub.nosync/sfu/c756.211.dead/sfu-cmpt756.203/gatling-charts-highcharts-bundle-3.5.0
+CHOME=~/newroot/GitHub.nosync/sfu/c756-cont
 run:
 	docker container run -it --rm \
 		-v ~/.aws:/root/.aws \
