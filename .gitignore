@@ -6,3 +6,5 @@ ec2-pem-path.txt
 token-path.txt
 code-path.txt
 ec2-instance-name.txt
+.vscode
+.DS_Store

@@ -60,6 +60,9 @@ dev:
 	docker push $(AINAME)
 
 
+.PHONY=all local ghcr sfu x86 arm
+
+
 # Publish this to the course's organization CR
 sfu: dev
 	docker tag $(AINAME) $(PUBLICNAME)
@@ -90,10 +93,20 @@ build:	${DOCKERFILE}
 	--build-arg K9S_ARCH=$(K9S_ARCH) \
 	-t ${CREG}/${REGID}/${INAME}:${VER}-$(ARCH_BRAND)64 .
 
+# TODO: suspect!
+# Likely no longer needed now that file is parameterized
+# override for ARM
+arm:
+	docker build --tag $(AINAME):arm \
+		--build-arg ARCH_CLASS=$(ARM_ARCH_CLASS)  \
+		--build-arg ARCH_BRAND=$(ARM_ARCH_BRAND)  \
+		--build-arg K9S_ARCH=$(ARM_K9S_ARCH) . 
+	docker image ls | grep $(INAME)
 
-# Convenient target to start the LOCAL copy for development
-GHOME=/Users/gkyc/newroot/GitHub.nosync/sfu/c756.211.dead/sfu-cmpt756.203/gatling-charts-highcharts-bundle-3.5.0
-CHOME=/Users/gkyc/newroot/GitHub.nosync/sfu/c756-cont
+# convenient target to start the LOCAL copy
+# This target's developer-specific
+GHOME=~/newroot/GitHub.nosync/sfu/c756.211.dead/sfu-cmpt756.203/gatling-charts-highcharts-bundle-3.5.0
+CHOME=~/newroot/GitHub.nosync/sfu/c756-cont
 run:
 	docker container run -it --rm \
 		-v ~/.aws:/root/.aws \
