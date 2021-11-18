@@ -22,7 +22,7 @@ ARM_ARCH_CLASS=aarch64
 ARM_ARCH_BRAND=arm
 ARM_K9S_ARCH=arm64
 
-.PHONE=all local ghcr sfu x86 arm
+.PHONY=all local ghcr sfu x86 arm
 
 
 all: local ghcr
