@@ -25,7 +25,7 @@ sudo ./docker-ec2-login-ghcr.sh
 #
 # Get the class code
 #
-git clone https://github.com/scp-2021-jan-cmpt-756/sfu-cmpt756.211.git
+git clone https://github.com/scp756-221/c756-exer.git
 #
 # Set the template variables
 #
