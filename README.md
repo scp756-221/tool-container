@@ -205,6 +205,7 @@ privileges.
 
    A full test requires the complete sequence to spin up, provision,
    and load test a cluster, which takes upwards of a half hour.
+   See `test_script.txt` for instructions on doing a full test.
 
 3. `push-dev-on-amd.sh` and `push-dev-on-arm.sh` (no parameters): Push
    the development image to the development image registry.

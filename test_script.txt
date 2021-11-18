@@ -1,0 +1,112 @@
+Nov 2021:
+
+Here's how to test this version of the package, using the containerized
+toolset.  
+
+Version tags:
+
+sfu-cmpt756.211: v22beta2
+ghcr.io/tedkirkpatrick/cmpt-756-tools: v1.0beta2
+
+#
+# Preparation
+#
+# 1. Get latest version of package
+cd # To directory sfu-cmpt756.211/e-k8s
+git pull origin v22beta2 
+#
+# 2. Pull container for your architecture
+# Let docker pull the right architecture (THIS SHOULD NOW WORK):
+docker image pull ghcr.io/tedkirkpatrick/cmpt-756-tools:v1.0beta2
+# OR, if that fails, explicitly request ARM 64
+docker image pull ghcr.io/tedkirkpatrick/cmpt-756-tools:v1.0beta2-arm64
+# OR AMD/Intel 64
+docker image pull ghcr.io/tedkirkpatrick/cmpt-756-tools:v1.0beta2-amd64
+# 3. Start the container
+tools/shell.sh
+#
+# From this point, all commands will be run in Linux, at a /home/k8s#
+# prompt.
+#
+# Also, from this point, every command will be the same as for Spring 2021,
+# it will just be run in the container.
+#
+# 4. Ensure that ~/.aws/credentials and ./cluster/tpl-vars.txt
+# files have your active AWS credentials
+#
+# 5. Instantiate the templates
+make -f k8s-tpl.mak templates
+#
+# 6. Start an EKS (say) cluster
+#    Azure is also available but ONLY on amd64 architectures.
+make -f eks.mak start
+#
+# This will take 10--15 minutes to complete
+#
+# 6A. Ensure that containers are simply pulled from GHCR, not rebuilt.
+# The system does not currently allow users to create new versions of
+# the application and loader containers.  This next step creates logs
+# that indicate to `make` that the containers do not need to be
+# rebuilt.
+touch logs/s1.repo.log logs/db.repo.log logs/s2-v1.repo.log logs/loader.repo.log
+#
+# 7. Provision the cluster
+make -f k8s.mak provision
+#
+# This will take ~5 minutes to complete
+#
+# 8. Run k9s and check that all pods have started successfully
+# Note:  You can run multiple instances of this container, with
+# k9s in one to observe results and entering commands in the other.
+# They will share contexts via the user's home directory on the
+# HOST OS.
+# Note that (as also happened in Spring 2021) there will be an
+# extra S2 pod with a "Terminated" status. There should be a
+# second S2 pod with "Running" status.
+k9s
+#
+# 8A. If not already set up, start DynamoDB and load its tables
+make -f k8s.mak loader
+#
+# 10. Once all pods are running, get the Grafana URL and log in
+# to it in a browser
+make -f k8s.mak grafana-url
+#
+# Paste the resulting URL into your browser and sign in:
+# user: admin
+# password: prom-operator
+# 
+# In the Dashboards menu (on the left), Select "Manage".  From the
+# list of dashboards, select "c756 transactions".
+#
+# Most graphs will be empty at this point because there is no
+# traffic
+#
+# 11. Start some traffic via Gatling
+# 5 callers each of music and users, with rate randomly varying
+tools/gatling.sh 5 ReadBothVaryingSim
+#
+# 12. After a few minutes, the Grafana graphs should begin
+# showing the traffic
+#
+# If you're seeing traffic, congratulations!  Everything worked.
+#
+# 13. Kill the Gatling job
+# Note: This version does not print the correct number of the
+# Gatling job. Do a `ps -eaf` and find the number of
+# the detached java process actually running Gatling.
+# OR don't kill the Gatling job explicitly---when you
+# exit the container it will be killed automatically.
+kill -9 # plus the process number of the Gatling job
+#
+# 14. Shut down the EKS cluster
+make -f eks.mak stop
+#
+# 15. Observe that you have no running clusters:
+# Note:  If you haven't recently signed in to Azure,
+# this will fail on the `az aks` call.  Sign in to
+# Azure via `az login` and rerun the command.
+make -f allclouds.mak ls
+#
+# 16. Leave the container
+exit
