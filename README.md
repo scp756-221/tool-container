@@ -33,13 +33,14 @@ The steps (run on each architecture):
    make TARGET_ARCH= ... dev
    ~~~
 
-4. Once *both* architectural images have been pushed to the development
-   registry, push the combined manifest to the registry
-   (note that you don't specify an architecture because this is only
-   run once and can be run on either architecture):
+4. Once *both* architectural images have been pushed to the
+   development registry, push the combined manifest to the registry
+   (note that you although you specify an architecture to satisfy the
+   Makefile, it is ignored because this command is run once and can be
+   run on either architecture):
 
    ~~~
-   make manifest
+   make TARGET_ARCH= ... manifest
    ~~~
 
 5. Once the image is ready for student use, push the public image:
@@ -49,12 +50,13 @@ The steps (run on each architecture):
    ~~~
 
 6. Once *both* architectural images have been pushed to the public
-   registry, push the combined manfiest to the registry:
-   (note that you don't specify an architecture because this is only
-   run once and can be run on either architecture):
+   registry, push the combined manifest to the registry (note that you
+   although you specify an architecture to satisfy the Makefile, it is
+   ignored because this command is run once and can be run on either
+   architecture):
 
    ~~~
-   make public-manifest
+   make TARGET_ARCH= ... public-manifest
    ~~~
 
 ## Helper scripts
