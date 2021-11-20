@@ -132,24 +132,23 @@ RUN pip install boto3
 #&& apt-get clean \
 #&& rm -rf /var/lib/apt/lists/*
 # Install latest Azure CLI
-# The install script uses apt-get
 RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash
 #
 # --- Docker (to build and push from scripts) ---
-# Nov 2021: No longer installed because everything runs from this container
 #
 # See
 #   https://docs.docker.com/engine/install/ubuntu/#installation-methods
 # Install required packages; ca-certificates and curl were installed above
-#RUN apt-get install -y \
-#      gnupg \
-#      lsb-release
+RUN apt-get install -y \
+      gnupg \
+      lsb-release
 # Now install docker
-#RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg \
-#&& echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
-#      $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null \
-#&& apt-get update \
-#&& apt-get install -y docker-ce docker-ce-cli containerd.io
+# Just install the command-line client. Its requests will be routed to the HOST's docker daemon.
+RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg \
+&& echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+      $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null \
+&& apt-get update \
+&& apt-get install -y docker-ce-cli
 #
 # --- Kubernetes tools ---
 #
@@ -311,6 +310,7 @@ VOLUME /${USER}/.azure
 VOLUME /${USER}/.ssh
 VOLUME /${USER}/.kube
 VOLUME /${USER}/.config
+VOLUME /var/run/docker.sock
 # Share Gatling scripts and results from e-k8s subdirectories
 VOLUME ["/opt/gatling/results", "/opt/gatling/user-files", "/opt/gatling/target"]
 
