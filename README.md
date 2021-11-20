@@ -35,7 +35,7 @@ The steps (run on each architecture):
 
 4. Once *both* architectural images have been pushed to the
    development registry, push the combined manifest to the registry
-   (note that you although you specify an architecture to satisfy the
+   (note that although you specify an architecture to satisfy the
    Makefile, it is ignored because this command is run once and can be
    run on either architecture):
 
@@ -50,7 +50,7 @@ The steps (run on each architecture):
    ~~~
 
 6. Once *both* architectural images have been pushed to the public
-   registry, push the combined manifest to the registry (note that you
+   registry, push the combined manifest to the registry (note that
    although you specify an architecture to satisfy the Makefile, it is
    ignored because this command is run once and can be run on either
    architecture):
@@ -222,3 +222,69 @@ privileges.
    have been pushed to the development image registry, run this to
    build a combined manifest. This only needs to be run once for each
    new version and can be run on either architecture.
+
+## Building a public image
+
+An image for public release to students is typically just another name
+for a development image that has passed testing and is ready for
+use by the class. In this case, "building" is simply a matter of
+assigning an additional tag to the existing development image and
+pushing that image to the container registry. This will have to be
+done once for each architecture.
+
+On an amd machine, assuming the current defaults for `PUBCREG` and
+`PUBREGID` in `Makefile`, the command typically would be:
+
+~~~
+$ docker image tag ghcr.io/REGID/INAME:VER-amd64 ghcr.io/scp756-221/c756-tool:VER-amd64
+$ docker push ghcr.io/scp756-221/c756-tool:VER-amd64
+~~~
+
+And on an arm machine:
+
+~~~
+$ docker image tag ghcrio.io/REGID/INAME:VER-arm64 ghcr.io/scp756-221/c756-tool:VER-arm64
+$ docker push ghcr.io/scp756-221/c756-tool:VER-arm64
+~~~
+
+Where:
+
+* `REGID` is the contents of `regid.txt`
+* `INAME` is the contents of `iname.txt`
+* `VER` is the contents of `version.txt`
+
+After these steps, build a combined manifest for the public image (see
+next section).
+
+## Publishing a combined manifest (development or public image)
+
+Once images have been built for both architectures, a combined
+manifest must be created on the container registry (currently
+`ghcr.io`).  This combined manifest links the two images in that
+registry, allowing clients to send an architecture-independent image
+tag and have the registry return the image appropriate to the client's
+OS and architecture. Our builds currently only support two such
+combinations, Linux/amd64 and Linux/arm64.
+
+As a prerequisite, the combined manifest can only be created after
+both images have been pushed to the registry with the same name and
+version, with the appropriate architecture appended, as requested for
+the manifest. If at least one of the prerequisite images is missing,
+you will get a `manifest unknown` message. Note that the images must
+have been pushed to the registry---their presence or absence on the
+local machine is irrelevant.
+
+**Development version:** Use the `build-manifest.sh` script to create
+  a combined manifest.
+
+**Public version:** There is no helper script for creating the public
+manifest but typically the defaults in the Makefile will be
+correct. A command such as the following is usually enough:
+
+~~~
+make TARGET_ARCH=amd VER=... public-manifest
+~~~
+
+The `TARGET_ARCH` parameter is required to be either `amd` or `arm`
+but is otherwise ignored.  The `VER` parameter must match whatever was
+used for the two images.
