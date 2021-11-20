@@ -79,7 +79,7 @@ manifest:
 
 # Publish the combined manifest for the public image
 public-manifest:
-	make CREG=PUBREG REGID=PUBREGID manifest
+	make CREG=$(PUBREG) REGID=$(PUBREGID) manifest
 
 
 # Build the image on the current architecture
