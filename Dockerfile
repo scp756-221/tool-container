@@ -295,9 +295,14 @@ RUN apt-get update \
 && rm -rf /var/lib/apt/lists/*
 #
 # Tools for debugging DNS (including `dig`)
+# Also ping to test reachability of a host
+# Also traceroute
 #
 RUN apt-get update \
-&& apt-get install -y dnsutils \
+&& apt-get install -y \
+  dnsutils \
+  iputils-ping \
+  traceroute \
 && apt-get clean \
 && rm -rf /var/lib/apt/lists/*
 #
