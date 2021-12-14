@@ -5,7 +5,7 @@ and publishing the image for both AMD64 and ARM64 architectures,
 together with their combined manifest. The manifest associates the 
 two images together under one tag for simplicity. I.e., users can
 refer to the image uniformly without specifying the architecture explicitly 
-(`docker pull ghcr.io/scp756-221/c756-tool:v1.0` instead of `docker pull ghcr.io/scp756-221/c756-tool:v1.0-x86`)
+(`docker pull ghcr.io/scp756-221/c756-tool:v1.0` instead of `docker pull ghcr.io/scp756-221/c756-tool:v1.0-arm64`. or `-amd64`)
 and Docker will pick the appropriate architecture as appropriate. 
 
 `Dockerfile` specifies how to build an image on one of
