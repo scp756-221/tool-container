@@ -29,4 +29,4 @@ git clone https://github.com/scp756-221/c756-exer.git
 #
 # Set the template variables
 #
-mv -f tpl-vars.txt c756-exer/e-k8s/cluster
+mv -f tpl-vars.txt c756-exer/cluster
