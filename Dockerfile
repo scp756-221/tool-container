@@ -46,7 +46,9 @@ ENV ISTIO_VER=1.11.4
 ENV HELM_VER=v3.7.1
 ENV KUSTOMIZE_VER=v4.4.0
 ENV GATLING_VER=3.4.2
-ENV K9S_VER=v0.25.0
+ENV K9S_VER=v0.25.15
+ENV DOCKER_COMPOSE_VER=v2.2.2
+ENV FLAKE8_VER=4.0.1
 #
 # Working directory for downloading etc. during installs
 #
@@ -119,7 +121,10 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-${ARCH_CLASS}.zip" -o "a
 RUN curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_Linux_${ARCH_BRAND}64.tar.gz" | tar xz -C /tmp \
 && mv /tmp/eksctl /usr/local/bin
 # AWS Python SDK
-RUN pip install boto3
+# Plus Flake8 for good measure
+# Note that the flake8 version specified here must exactly match the one specified in
+# the `c756-exer/.github/workflows/ci-system*.yaml` files for running CI on GitHub.
+RUN pip install boto3 flake8==${FLAKE8_VER}
 #
 # --- Azure tools ---
 #
@@ -142,13 +147,16 @@ RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash
 RUN apt-get install -y \
       gnupg \
       lsb-release
-# Now install docker
+# Now install docker and docker-compose
 # Just install the command-line client. Its requests will be routed to the HOST's docker daemon.
 RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg \
 && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
       $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null \
 && apt-get update \
-&& apt-get install -y docker-ce-cli
+&& apt-get install -y docker-ce-cli \
+&& curl -L "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VER}/docker-compose-linux-${ARCH_CLASS}" \
+     -o /usr/local/bin/docker-compose \
+&& chmod +x /usr/local/bin/docker-compose
 #
 # --- Kubernetes tools ---
 #
@@ -282,6 +290,7 @@ RUN apt-get update \
 #
 # kustomize (https://kubectl.docs.kubernetes.io/guides/introduction/kustomize/)
 # Extend `kubectl`
+# Kustomize summary sheet: https://scribe.rip/@olegsucharevich/kubernetes-kustomize-cheat-sheet-8e2d31b74d8f
 #
 RUN curl -sLO https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/${KUSTOMIZE_VER}/kustomize_${KUSTOMIZE_VER}_linux_${ARCH_BRAND}64.tar.gz \
 && tar xzf kustomize_${KUSTOMIZE_VER}_linux_${ARCH_BRAND}64.tar.gz \
@@ -310,8 +319,11 @@ RUN apt-get update \
 #
 # Share user's home directory configurations
 # (`docker container run` in Makefile must `-v` each of these)
+# Note that though we map in the Minikube directory, kubectl
+# can not yet contact a Minikube cluster
 VOLUME /${USER}/.aws
 VOLUME /${USER}/.azure
+VOLUME /${USER}/.minikube
 VOLUME /${USER}/.ssh
 VOLUME /${USER}/.kube
 VOLUME /${USER}/.config
