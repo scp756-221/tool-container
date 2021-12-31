@@ -18,4 +18,4 @@ set -o xtrace
 ./transfer.sh ~/.aws/credentials
 ./transfer.sh docker-ec2-login-ghcr.sh
 ./transfer.sh ${tokens}/ec2-ghcr-token.txt 
-./transfer.sh ${code}/e-k8s/cluster/tpl-vars.txt
+./transfer.sh ${code}/cluster/tpl-vars.txt
