@@ -126,16 +126,15 @@ tested on them.
 Start with the scripts to transfer all the necessary files to
 that instance and set it up:
 
-1. `signon.sh EC2-INSTANCE_NAME`: Signs in to the EC2 instance and
-   stores the name in `ec2-instance-name.txt` for later use by
-   `transfer.sh` and `second-signon.sh`. Do not include the user name
-   in the instance name; it is assumed to be `ubuntu` in all the
-   scripts.
+1. `signon.sh EC2_INSTANCE_NAME USERID`: Signs in to the EC2 instance and
+   stores the name in `ec2-instance-name.txt` and the userid in `ec2-userid.txt` for later use by `transfer.sh` and `second-signon.sh`.
+
+   The userid for Ubuntu AMIs is `ubuntu`.  For Amazon Linux AMIs it is `ec2-user`.
 
    The EC2 instance must use the SSH key whose path is specified in
    `ec2-pem-path.txt`.
 
-   Example: `./signon.sh ec2-35-86-216-234.us-west-2.compute.amazonaws.com`
+   Example: `./signon.sh ec2-35-86-216-234.us-west-2.compute.amazonaws.com ubuntu`
 
 4. `send-to-arm.sh` (run on home machine): Transfers all the
    necessary files from your machine to the *home* directory on the
